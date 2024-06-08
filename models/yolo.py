@@ -445,10 +445,9 @@ def parse_model(d, ch):
         LOGGER.info(f"{i:>3}{str(f):>18}{n_:>3}{np:10.0f}  {t:<40}{str(args):<30}")  # print
         save.extend(x % i for x in ([f] if isinstance(f, int) else f) if x != -1)  # append to savelist
         layers.append(m_)
-        if i == 0:
-            ch = []
-        ch.append(c2)
+        ch.append(c2)  # Add updated channel to ch list
     return nn.Sequential(*layers), sorted(save)
+
 
 
 if __name__ == "__main__":
