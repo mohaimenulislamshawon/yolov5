@@ -1,54 +1,53 @@
 # YOLOv5 🚀 by Ultralytics, AGPL-3.0 license
 
 # Parameters
-nc: 8  # number of classes
-depth_multiple: 0.67  # model depth multiple
-width_multiple: 0.75  # layer channel multiple
+nc: 8 # number of classes
+depth_multiple: 0.67 # model depth multiple
+width_multiple: 0.75 # layer channel multiple
 anchors:
-  - [10, 13, 16, 30, 33, 23]  # P3/8
-  - [30, 61, 62, 45, 59, 119]  # P4/16
-  - [116, 90, 156, 198, 373, 326]  # P5/32
+  - [10, 13, 16, 30, 33, 23] # P3/8
+  - [30, 61, 62, 45, 59, 119] # P4/16
+  - [116, 90, 156, 198, 373, 326] # P5/32
 
 # Modified YOLOv5 backbone with ConViT-inspired architecture
 backbone:
   # [from, number, module, args]
   [
-    [-1, 1, Conv, [24, 7, 2, 2]],  # 0 - ConViT: Conv layer with kernel size 7
-    [-1, 1, nn.MaxPool2d, [3, 2, 1]],  # 1 - ConViT: MaxPool layer
-    [-1, 1, Conv, [40, 3, 1, 1]],  # 2 - ConViT: Conv layer with kernel size 3
-    [-1, 1, nn.MaxPool2d, [3, 2, 1]],  # 3 - ConViT: MaxPool layer
-    [-1, 1, Conv, [72, 3, 1, 1]],  # 4 - ConViT: Conv layer with kernel size 3
-    [-1, 1, nn.MaxPool2d, [3, 2, 1]],  # 5 - ConViT: MaxPool layer
-    [-1, 1, C3, [72, 72, 1]],  # 6 - Bottleneck (C3) layer
-    [-1, 1, Conv, [144, 3, 2]],  # 7 - Transition layer: Conv layer
-    [-1, 3, C3, [144, 144, 3]],  # 8 - Standard YOLOv5 Bottleneck (C3) layer
-    [-1, 1, Conv, [288, 3, 2]],  # 9 - Transition layer: Conv layer
-    [-1, 4, C3, [288, 288, 4]],  # 10 - Standard YOLOv5 Bottleneck (C3) layer
-    [-1, 1, Conv, [576, 3, 2]],  # 11 - Transition layer: Conv layer
-    [-1, 1, C3, [576, 576, 1]],  # 12 - Standard YOLOv5 Bottleneck (C3) layer
-    [-1, 1, SPPF, [576, 576, 5]],  # 13 - Standard YOLOv5 SPPF layer
+    [-1, 1, Conv, [24, 7, 2, 2]], # 0 - ConViT: Conv layer with kernel size 7
+    [-1, 1, nn.MaxPool2d, [3, 2, 1]], # 1 - ConViT: MaxPool layer
+    [-1, 1, Conv, [48, 3, 1, 1]], # 2 - ConViT: Conv layer with kernel size 3
+    [-1, 1, nn.MaxPool2d, [3, 2, 1]], # 3 - ConViT: MaxPool layer
+    [-1, 1, Conv, [96, 3, 1, 1]], # 4 - ConViT: Conv layer with kernel size 3
+    [-1, 1, nn.MaxPool2d, [3, 2, 1]], # 5 - ConViT: MaxPool layer
+    [-1, 2, C3, [96, 96, 2]], # 6 - Bottleneck (C3) layer
+    [-1, 1, Conv, [192, 3, 2]], # 7 - Transition layer: Conv layer
+    [-1, 4, C3, [192, 192, 4]], # 8 - Standard YOLOv5 Bottleneck (C3) layer
+    [-1, 1, Conv, [384, 3, 2]], # 9 - Transition layer: Conv layer
+    [-1, 6, C3, [384, 384, 6]], # 10 - Standard YOLOv5 Bottleneck (C3) layer
+    [-1, 1, Conv, [768, 3, 2]], # 11 - Transition layer: Conv layer
+    [-1, 2, C3, [768, 768, 2]], # 12 - Standard YOLOv5 Bottleneck (C3) layer
+    [-1, 1, SPPF, [768, 768, 5]], # 13 - Standard YOLOv5 SPPF layer
   ]
 
 # YOLOv5 v6.0 head
-head:
-  [
-    [-1, 1, Conv, [288, 1, 1]],  # 14 - Squeeze feature map size
-    [-1, 1, nn.Upsample, [None, 2, "nearest"]],  # 15 - Upsample
-    [[-1, 10], 1, Concat, [1]],  # 16 - Concat with backbone P4
-    [-1, 1, C3, [576, 288, 1, False]],  # 17
+head: [
+    [-1, 1, Conv, [384, 1, 1]], # 14 - Conv layer
+    [-1, 1, nn.Upsample, [None, 2, "nearest"]], # 15 - Upsample layer
+    [[-1, 10], 1, Concat, [1]], # 16 - Concat with backbone P4
+    [-1, 2, C3, [384, 192, 2, False]], # 17 - C3 layer
 
-    [-1, 1, Conv, [144, 1, 1]],  # 18 - Squeeze feature map size
-    [-1, 1, nn.Upsample, [None, 2, "nearest"]],  # 19 - Upsample
-    [[-1, 8], 1, Concat, [1]],  # 20 - Concat with backbone P3
-    [-1, 1, C3, [288, 144, 1, False]],  # 21 (P3/8-small)
+    [-1, 1, Conv, [192, 1, 1]], # 18 - Conv layer
+    [-1, 1, nn.Upsample, [None, 2, "nearest"]], # 19 - Upsample layer
+    [[-1, 8], 1, Concat, [1]], # 20 - Concat with backbone P3
+    [-1, 2, C3, [192, 96, 2, False]], # 21 - C3 layer
 
-    [-1, 1, Conv, [144, 3, 2]],  # 22 - Reduce feature map size
-    [[-1, 17], 1, Concat, [1]],  # 23 - Concat with head P4
-    [-1, 1, C3, [432, 288, 1, False]],  # 24 (P4/16-medium)
+    [-1, 1, Conv, [192, 3, 2]], # 22 - Conv layer
+    [[-1, 17], 1, Concat, [1]], # 23 - Concat with head P4
+    [-1, 2, C3, [576, 384, 2, False]], # 24 - C3 layer
 
-    [-1, 1, Conv, [288, 3, 2]],  # 25 - Reduce feature map size
-    [[-1, 12], 1, Concat, [1]],  # 26 - Concat with head P5
-    [-1, 1, C3, [864, 576, 1, False]],  # 27 (P5/32-large)
+    [-1, 1, Conv, [384, 3, 2]], # 25 - Conv layer
+    [[-1, 12], 1, Concat, [1]], # 26 - Concat with head P5
+    [-1, 2, C3, [1152, 768, 2, False]], # 27 - C3 layer
 
-    [[21, 24, 27], 1, Detect, [nc, anchors]],  # 28 - Detect(P3, P4, P5)
+    [[21, 24, 27], 1, Detect, [nc, anchors]], # 28 - Detect layer (P3, P4, P5)
   ]
