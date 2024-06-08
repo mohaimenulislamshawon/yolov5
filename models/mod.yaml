@@ -9,17 +9,17 @@ anchors:
   - [30, 61, 62, 45, 59, 119] # P4/16
   - [116, 90, 156, 198, 373, 326] # P5/32
 
-# Modified YOLOv5 backbone with ConViT architecture
+# Modified YOLOv5 backbone with ConViT-inspired architecture
 backbone:
   # [from, number, module, args]
   [
-    [-1, 1, Conv, [32, 7, 2, 2]], # 0 - ConViT: Conv layer with kernel size 7
-    [-1, 1, MaxPool, [3, 2, 1]], # 1 - ConViT: MaxPool layer
+    [-1, 1, Conv, [24, 7, 2, 2]], # 0 - ConViT: Conv layer with kernel size 7
+    [-1, 1, nn.MaxPool2d, [3, 2, 1]], # 1 - ConViT: MaxPool layer
     [-1, 1, Conv, [64, 3, 1, 1]], # 2 - ConViT: Conv layer with kernel size 3
-    [-1, 1, MaxPool, [3, 2, 1]], # 3 - ConViT: MaxPool layer
+    [-1, 1, nn.MaxPool2d, [3, 2, 1]], # 3 - ConViT: MaxPool layer
     [-1, 1, Conv, [128, 3, 1, 1]], # 4 - ConViT: Conv layer with kernel size 3
-    [-1, 1, MaxPool, [3, 2, 1]], # 5 - ConViT: MaxPool layer
-    [-1, 3, C3, [128]], # 6 - ConViT: Bottleneck (C3) layer
+    [-1, 1, nn.MaxPool2d, [3, 2, 1]], # 5 - ConViT: MaxPool layer
+    [-1, 3, C3, [128]], # 6 - Bottleneck (C3) layer
     [-1, 1, Conv, [256, 3, 2]], # 7 - Transition layer: Conv layer
     [-1, 6, C3, [256]], # 8 - Standard YOLOv5 Bottleneck (C3) layer
     [-1, 1, Conv, [512, 3, 2]], # 9 - Transition layer: Conv layer
